@@ -44,6 +44,7 @@ export default {
         if (this.$route.name == 'couriers.edit') {
             //MAKA FUNGSI UNTUK MENGAMBIL DATA YANG AKAN DIEDIT DIJALANKAN BERDASARKAN PARAMETER ID YANG ADA DI URL
             this.editCourier(this.$route.params.id).then((res) => {
+                console.log(res)
                 //RESPON YANG DITERIMA AKAN DIMASUKKAN KEDALAM ATTRIBTUE KURIR 
                 this.courier = {
                     name: res.data.name,

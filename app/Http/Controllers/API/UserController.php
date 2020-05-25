@@ -7,7 +7,11 @@ use App\Http\Controllers\Controller;
 
 use App\User;
 use App\Http\Resources\UserCollection;
-
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File as FacadesFile;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -19,5 +23,93 @@ class UserController extends Controller
         }
         $users = $users->paginate(10);
         return new UserCollection($users);
+    }
+
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|string|max:150',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6|string',
+            'outlet_id' => 'required|exists:outlets,id',
+            'photo' => 'required|image'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $name = NULL;
+
+            if ($request->hasFile('photo')) {
+                $file = $request->file('photo');
+                $name = $request->email.'-'.time().'.'.$file->getClientOriginalExtension();
+                $file->storeAs('public/couriers', $name);
+            }
+
+            User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $request->password,
+                'role' => $request->role,
+                'photo' => $name,
+                'outlet_id' => $request->outlet_id,
+                'role' => 3
+            ]);
+            DB::commit();
+
+        } catch(Exception $e) {
+            DB::rollback();
+            return response()->json(['status' => 'error', 'data' => $e->getMessage()], 200);
+        }
+    }
+
+    public function edit($id)
+    {
+        $user = User::find($id);
+        return response()->json(['status' => 'success', 'data' => $user], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        //VALIDASI DATA
+        $this->validate($request, [
+            'name' => 'required|string|max:150',
+            'email' => 'required|email',
+            'password' => 'nullable|min:6|string',
+            'outlet_id' => 'required|exists:outlets,id',
+            'photo' => 'nullable|image'
+        ]);
+
+        try {
+            $user = User::find($id);
+
+            $password = $request->password != '' ? bcrypt($request->password):$user->password;
+            $filename = $user->photo;
+
+            if ($request->hasFile('photo')) {
+                $file = $request->file('photo');
+                unlink(storage_path('app/public/couriers/' . $filename));
+                $filename = $request->email . '-' . time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/couriers', $filename);
+            }
+
+            $user->update([
+                'name' => $request->name,
+                'password' => $password,
+                'photo' => $filename,
+                'outlet_id' => $request->outlet_id
+            ]);
+            return response()->json(['status' => 'success'], 200);
+
+        } catch (\Exception  $e) {
+            return response()->json(['status' => 'error', 'data' => $e->getMessage()], 200);
+        }
+    }
+
+    public function destroy($id)
+    {
+        $user = User::find($id); //MENGAMBIL DATA YANG AKAN DIHAPUS
+        unlink(storage_path('app/public/couriers/' . $user->photo)); //MENGHAPUS FILE FOTO
+        $user->delete(); //MENGHAPUS DATANYA
+        return response()->json(['status' => 'success']);
     }
 }

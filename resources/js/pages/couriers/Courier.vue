@@ -19,7 +19,7 @@
                     <template slot="outlet_id" slot-scope="row">
                         {{ row.item.outlet.name }}
                     </template>
-                    <template slot="actions" slot-scope="row">
+                    <template v-slot:cell(actions)="row">
                         <router-link :to="{ name: 'couriers.edit', params: {id: row.item.id} }" class="btn btn-warning btn-sm"><i class="fa fa-pencil"></i></router-link>
                         <button class="btn btn-danger btn-sm" @click="deleteCourier(row.item.id)"><i class="fa fa-trash"></i></button>
                     </template>

@@ -13,6 +13,7 @@ import EditOutlet from './pages/outlets/Edit.vue'
 import IndexCourier from './pages/couriers/Index.vue'
 import DataCourier from './pages/couriers/Courier.vue'
 import AddCouriers from './pages/couriers/Add.vue'
+import EditCouriers from './pages/couriers/Edit.vue'
 
 Vue.use(Router)
 
@@ -72,6 +73,12 @@ const router = new Router({
                     name: 'couriers.add',
                     component: AddCouriers,
                     meta: { title: 'Add New Courier' }
+                },
+                {
+                    path: 'edit/:id',
+                    name: 'couriers.edit',
+                    component: EditCouriers,
+                    meta: { title: 'Edit Courier' }
                 },
                 //NANTINYA AKAN BERISI CHILDREN LAINNYA DARI PAGE COURIERS
             ]
