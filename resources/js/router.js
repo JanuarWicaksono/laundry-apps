@@ -14,6 +14,10 @@ import IndexCourier from './pages/couriers/Index.vue'
 import DataCourier from './pages/couriers/Courier.vue'
 import AddCouriers from './pages/couriers/Add.vue'
 import EditCouriers from './pages/couriers/Edit.vue'
+import IndexProduct from './pages/products/Index.vue'
+import DataProduct from './pages/products/Product.vue'
+import AddProduct from './pages/products/Add.vue'
+import EditProduct from './pages/products/Edit.vue'
 
 Vue.use(Router)
 
@@ -81,6 +85,31 @@ const router = new Router({
                     meta: { title: 'Edit Courier' }
                 },
                 //NANTINYA AKAN BERISI CHILDREN LAINNYA DARI PAGE COURIERS
+            ]
+        },
+        {
+            path: '/product',
+            component: IndexProduct,
+            meta: { requiresAuth: true },
+            children: [
+                {
+                    path: '',
+                    name: 'products.data',
+                    component: DataProduct,
+                    meta: { title: 'Manage Products' }
+                },
+                {
+                    path: 'add',
+                    name: 'products.add',
+                    component: AddProduct,
+                    meta: { title: 'Add New Product' }
+                },
+                {
+                    path: 'edit/:id',
+                    name: 'products.edit',
+                    component: EditProduct,
+                    meta: { title: 'Edit Product' }
+                },
             ]
         }
     ], 
